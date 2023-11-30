@@ -14,9 +14,9 @@
 
   fileSystems."/" =
     { 
-      device = "/dev/disk/by-label/NixOS";
-      fsType = "btrfs";
-      options = [ "subvol=@root" "compress=zstd" ];
+      device = "tmpfs";
+      fsType = "tmpfs";
+      options = [ "mode=755" ];
     };
 
   fileSystems."/home" =
@@ -31,15 +31,9 @@
       fsType = "btrfs";
       options = [ "subvol=@nix" "compress=zstd" "noatime" ];
     };
-
-  fileSystems."/var/log" =
-    { device = "/dev/disk/by-label/NixOS";
-      fsType = "btrfs";
-      options = [ "subvol=@log" "compress=zstd" "noatime" ];
-    };
     
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/EFI";
+    { device = "/dev/disk/by-label/EFI";
       fsType = "vfat";
     };
 

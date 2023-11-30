@@ -1,4 +1,4 @@
-{ pkgs, inputs, lib, ... }:
+{ config, pkgs, inputs, outputs, flake, lib, ... }:
 
 {
   imports = [
@@ -24,6 +24,7 @@
   services.pipewire.pulse.enable = true;
   services.pipewire.jack.enable = true;
 
+  hardware.opengl.enable = true;
   services.xserver.enable = true;
   services.xserver.layout = "us";
   services.xserver.displayManager.gdm.enable = true;
@@ -40,11 +41,32 @@
     gnome.gnome-tweaks
     gnomeExtensions.appindicator
     gnomeExtensions.caffeine
+    gnomeExtensions.blur-my-shell
     adw-gtk3
     wl-clipboard
     wl-clipboard-x11
   ];
 
+  programs.dconf = {
+    enable = true;
+    profiles = {
+      user = {
+        databases = [
+          { keyfiles = [ ../files/gnome-dconf ]; }
+	];
+      };
+      gdm = {
+        databases = [
+          { keyfiles = [ ../files/gdm-dconf ]; }
+	];
+      };
+    };
+  };
+  
+  services.udev.extraRules = ''
+    SUBSYSTEM=="usb", MODE="0660", GROUP="usb", TAG+="uaccess"
+  '';
+  
   services.printing.enable = true;
   services.printing.drivers = [ pkgs.hplip ];
 
@@ -63,11 +85,15 @@
     lohit-fonts.bengali
     (nerdfonts.override { fonts = [ "Iosevka" ]; })
   ];
+  
+  users.groups = {
+    usb = {};
+  };
 
   users.users.ashahir05 = {
     description = "Ahmed Shahir Samin";
     isNormalUser = true;
-    extraGroups = [ "wheel" "input" "dialout" ];
+    extraGroups = [ "wheel" "input" "networkmanager" "dialout" "usb" ];
     packages = with pkgs; [
       
     ];
@@ -87,8 +113,8 @@
     registry = let 
       flakeInputs = builtins.listToAttrs (lib.lists.remove null (lib.attrsets.mapAttrsToList (key: value: if value ? _type && value._type == "flake" then { name = key; value = value; } else null) inputs));
     in 
-      lib.mapAttrs (_: value: { flake = value; }) flakeInputs;
-    nixPath = lib.mapAttrsToList (key: value: "${key}=${value.to.path}") config.nix.registry; 
+      lib.mapAttrs (_: value: { flake = value; }) flakeInputs // { nixpkgs.flake = flake; };
+    nixPath = lib.mapAttrsToList (key: value: "${key}=${value.to.path}") config.nix.registry;
 
     gc = {
       automatic = true;
@@ -113,13 +139,6 @@
   programs.nix-index-database.comma.enable = true;
   
   programs.nix-ld.enable = true;
-
-  environment.sessionVariables.GST_PLUGIN_SYSTEM_PATH_1_0 = lib.makeSearchPathOutput "lib" "lib/gstreamer-1.0" [
-    pkgs.gst_all_1.gst-plugins-good
-    pkgs.gst_all_1.gst-plugins-bad
-    pkgs.gst_all_1.gst-plugins-ugly
-    pkgs.gst_all_1.gst-libav
-  ];
 
   boot.binfmt.registrations.appimage = {
     wrapInterpreterInShell = false;

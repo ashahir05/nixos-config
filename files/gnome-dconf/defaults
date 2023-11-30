@@ -1,0 +1,15 @@
+[org/gnome/desktop/interface]
+font-antialiasing='rgba'
+monospace-font-name='Iosevka Nerd Font Mono 13'
+gtk-theme='adw-gtk3'
+
+[org/gnome/desktop/peripherals/touchpad]
+tap-to-click=true
+click-method='areas'
+
+[org/gnome/desktop/wm/preferences]
+action-middle-click-titlebar='minimize'
+
+[org/gnome/mutter]
+dynamic-workspaces=true
+edge-tiling=true

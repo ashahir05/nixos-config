@@ -8,13 +8,13 @@
     nnn
     commonsCompress
     unzip
+    sbctl
+    e2fsprogs
     manix
     file
     lshw
-    openbangla-keyboard
-    amberol
+    ibus-engines.openbangla-keyboard
     vlc
-    fragments
     google-chrome
   ];
 }
